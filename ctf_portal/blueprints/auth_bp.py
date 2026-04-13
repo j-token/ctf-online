@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, flash, make_response, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, g, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..auth import create_jwt
@@ -9,7 +9,8 @@ bp = Blueprint('auth', __name__)
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
-    if session.get('user_id'):
+    # session.get('user_id') 대신 g.user 사용: DB 미존재 사용자(Railway 재배포 후 세션 잔류)로 인한 무한 리디렉션 방지
+    if g.user:
         return redirect(url_for('dashboard.dashboard'))
 
     if request.method == 'POST':
@@ -49,7 +50,7 @@ def login():
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
-    if session.get('user_id'):
+    if g.user:
         return redirect(url_for('dashboard.dashboard'))
 
     if request.method == 'POST':
