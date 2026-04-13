@@ -4,7 +4,12 @@
 
 {% block content %}
 <div class="card">
-    <div class="card-header">{{ profile['nickname'] }}</div>
+    <div class="card-header">
+        {{ profile['nickname'] }}
+        {% if is_retired %}
+        <span class="badge badge-closed" style="margin-left:8px;">퇴직</span>
+        {% endif %}
+    </div>
     <table>
         <tr><th style="width:120px">부서</th><td>{{ profile['department'] }}</td></tr>
         <tr><th>직책</th><td>{{ profile['position'] }}</td></tr>
@@ -18,9 +23,10 @@
     </table>
 </div>
 
-<!-- 디버그: 프로필 로드 완료. 비공개 메모 필드 포함됨 -->
-{% if private_note %}
-<!-- internal_note: {{ private_note }} -->
+{% if is_retired %}
+<div class="alert alert-warning">
+    이 프로필은 퇴직 처리되었습니다. 일부 정보가 제한됩니다.
+</div>
 {% endif %}
 
 <a href="{{ url_for('directory.directory_list') }}" class="btn btn-secondary mt-16">목록으로</a>

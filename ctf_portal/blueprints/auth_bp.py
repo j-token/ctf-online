@@ -1,6 +1,7 @@
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, current_app, flash, make_response, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from ..auth import create_jwt
 from ..db import get_db
 
 bp = Blueprint('auth', __name__)
@@ -27,7 +28,19 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('dashboard.dashboard'))
+
+            # JWT 쿠키 발행 (Ch2 공격 표면)
+            jwt_payload = {
+                'user_id': user['id'],
+                'username': user['username'],
+                'role': user['role'],
+                'iat': __import__('time').time()
+            }
+            token = create_jwt(jwt_payload, current_app.config['SECRET_KEY'])
+
+            resp = make_response(redirect(url_for('dashboard.dashboard')))
+            resp.set_cookie('ic_token', token, httponly=True, samesite='Lax')
+            return resp
 
         flash(error, 'danger')
 
@@ -79,4 +92,6 @@ def register():
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('auth.login'))
+    resp = make_response(redirect(url_for('auth.login')))
+    resp.delete_cookie('ic_token')
+    return resp

@@ -4,8 +4,19 @@
 
 {% block content %}
 <p class="section-desc">사내 직원 목록입니다. 이름을 클릭하면 상세 프로필을 확인할 수 있습니다.</p>
+<p class="text-muted" style="font-size:12px;">표시: {{ profiles|length }}건 / 전체: {{ total_count }}건</p>
 
 <div class="card">
+    <div class="card-header">직원 검색 API</div>
+    <p class="section-desc">JSON 기반 고급 검색을 사용하려면 <code>POST /directory/search</code>에 JSON body를 전송하세요.</p>
+    <pre>{
+  "department": "보안",
+  "name": {"$regex": "^김"}
+}</pre>
+</div>
+
+<div class="card mt-16">
+    <div class="card-header">재직 직원</div>
     <div class="table-wrapper">
         <table>
             <thead>

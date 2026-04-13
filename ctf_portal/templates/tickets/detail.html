@@ -20,18 +20,27 @@
     </div>
 </div>
 
-{% if internal_memo %}
+{% if encrypted_memo %}
 <div class="card">
-    <div class="card-header">내부 복구 메모</div>
-    <p style="white-space: pre-wrap;">{{ internal_memo }}</p>
+    <div class="card-header">내부 메모 (암호화됨)</div>
+    <p class="section-desc">이 메모는 보안 정책에 따라 XOR 암호화되어 있습니다.</p>
+    <pre style="word-break:break-all;">{{ encrypted_memo }}</pre>
+    <p class="text-muted mt-8" style="font-size:12px;">
+        암호화 정책: XOR 대칭 암호화<br>
+        키 파생: 티켓 고유 식별자의 SHA256 해시 앞 16바이트
+    </p>
 </div>
 {% endif %}
 
 <div class="action-group mt-16">
-    {% if ticket['status'] == 'closed' or ticket['status'] == 'open' %}
+    {% if is_admin and ticket['status'] in ('closed', 'open') %}
     <form method="post" action="{{ url_for('tickets.ticket_reopen', ticket_id=ticket['id']) }}">
         <button type="submit" class="btn btn-warning">재오픈</button>
     </form>
+    {% elif not is_admin and ticket['status'] in ('closed', 'open') %}
+    <div class="alert alert-info" style="margin:0;">
+        재오픈에는 관리자(admin) 권한이 필요합니다.
+    </div>
     {% endif %}
     <a href="{{ url_for('tickets.ticket_list') }}" class="btn btn-secondary">목록으로</a>
 </div>

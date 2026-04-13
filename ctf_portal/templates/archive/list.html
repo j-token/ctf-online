@@ -31,4 +31,40 @@
         </table>
     </div>
 </div>
+
+<div class="card mt-24">
+    <div class="card-header">문서 검증 시스템</div>
+    <p class="section-desc">분산 보관된 기밀 문서 조각의 무결성을 검증합니다.</p>
+    <form method="post" action="{{ url_for('archive.archive_assemble') }}" id="assemble-form">
+        <div class="form-group">
+            <label for="verification_code">검증 코드</label>
+            <input type="text" id="verification_code" name="verification_code" placeholder="조각 조합 결과를 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="classification">문서 분류 코드</label>
+            <input type="text" id="classification" name="classification" placeholder="분류 코드를 입력하세요">
+        </div>
+        <button type="submit" class="btn btn-primary">검증</button>
+    </form>
+    <div id="assemble-result" class="mt-8"></div>
+</div>
+
+<script>
+document.getElementById('assemble-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = this;
+    fetch(form.action, {method:'POST', body: new FormData(form)})
+        .then(function(r){return r.json()})
+        .then(function(d){
+            var el = document.getElementById('assemble-result');
+            if(d.success) {
+                el.className = 'mt-8 alert alert-success';
+                el.textContent = d.flag;
+            } else {
+                el.className = 'mt-8 alert alert-danger';
+                el.textContent = d.message || d.error;
+            }
+        });
+});
+</script>
 {% endblock %}

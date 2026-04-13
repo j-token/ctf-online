@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS directory_profiles (
     email         TEXT    NOT NULL,
     phone         TEXT,
     bio           TEXT,
-    private_note  TEXT
+    private_note  TEXT,
+    active        INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS tickets (
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS payroll_requests (
     approve_count   INTEGER NOT NULL DEFAULT 0,
     cancel_count    INTEGER NOT NULL DEFAULT 0,
     approved_by     INTEGER REFERENCES users(id),
+    approval_chain  TEXT    NOT NULL DEFAULT '[]',
     memo            TEXT,
     snapshot_data   TEXT,
     created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
@@ -84,5 +86,13 @@ CREATE TABLE IF NOT EXISTS verification_samples (
     message       TEXT    NOT NULL,
     nonce         TEXT    NOT NULL,
     signature     TEXT    NOT NULL,
-    is_public     INTEGER NOT NULL DEFAULT 1
+    is_public     INTEGER NOT NULL DEFAULT 1,
+    nonce_group   INTEGER NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS verification_logs (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    sample_id     INTEGER REFERENCES verification_samples(id),
+    action        TEXT    NOT NULL,
+    performed_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );

@@ -1,15 +1,21 @@
-"""Challenge 3: Archive Smuggler (Path Traversal)
-다운로드 경로 검증이 약해 상대 경로 우회가 가능함.
+"""Challenge 3: Archive Smuggler (350pt)
+Path Traversal 필터 우회 (URL 인코딩) → 디렉토리 리스팅 → Cross-file 키 추출
+→ XOR 복호화 → 조각 조합 → /assemble 제출.
 """
 import os
+from urllib.parse import unquote
 
-from flask import Blueprint, Response, current_app, g, render_template, request, abort
+from flask import Blueprint, Response, current_app, g, jsonify, render_template, request, abort
 
 from ..auth import login_required
 from ..db import get_db
 from ..flags import generate_flag
 
 bp = Blueprint('archive', __name__, url_prefix='/archive')
+
+
+def _xor_bytes(data, key):
+    return bytes(d ^ key[i % len(key)] for i, d in enumerate(data))
 
 
 @bp.route('/')
@@ -30,17 +36,30 @@ def archive_download():
     if not filename:
         abort(400)
 
-    # 취약점: null byte만 차단, realpath 검증 생략 → path traversal 가능
     if '\x00' in filename:
         abort(400)
 
+    # 필터: raw query string에서 '../' 리터럴만 차단
+    # 취약점: URL 인코딩(%2e%2e%2f)은 raw QS에 없으므로 우회 가능
+    raw_qs = request.query_string.decode('utf-8', errors='replace')
+    if '../' in raw_qs:
+        return jsonify({
+            'error': '경로에 허용되지 않는 문자열이 포함되어 있습니다.',
+            'blocked': '../',
+            'filter': 'literal_sequence_check'
+        }), 403
+
+    # Flask가 자동 디코딩한 값으로 경로 구성 (%2e%2e%2f → ../)
     base_path = os.path.join(current_app.config['STORAGE_PATH'], 'public')
     filepath = os.path.join(base_path, filename)
 
-    # 디렉토리 접근 시 파일 목록 반환 (취약점: 디렉토리 리스팅)
+    # 디렉토리 접근 시 파일 목록 반환
     if os.path.isdir(filepath):
-        files = os.listdir(filepath)
-        listing = '\n'.join(files)
+        try:
+            entries = os.listdir(filepath)
+        except OSError:
+            abort(404)
+        listing = '\n'.join(sorted(entries))
         return Response(
             f'Directory listing: {filename}\n\n{listing}\n',
             mimetype='text/plain'
@@ -49,21 +68,37 @@ def archive_download():
     if not os.path.isfile(filepath):
         abort(404)
 
-    # 파일 내용을 읽어서 {{FLAG}} 플레이스홀더를 동적 치환
+    # 텍스트 파일: 내용 읽기
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
     except (UnicodeDecodeError, OSError):
-        # 바이너리 파일은 그대로 전송
-        from flask import send_file
-        return send_file(filepath, as_attachment=True)
-
-    if '{{FLAG}}' in content:
-        flag = generate_flag('archive_smuggler', g.user['id'], current_app.config['SECRET_KEY'])
-        content = content.replace('{{FLAG}}', flag)
+        # 바이너리 파일(.enc 등)은 raw bytes로 반환
+        with open(filepath, 'rb') as f:
+            data = f.read()
+        return Response(data, mimetype='application/octet-stream',
+                        headers={'Content-Disposition': f'attachment; filename="{os.path.basename(filepath)}"'})
 
     return Response(
         content,
         mimetype='text/plain',
         headers={'Content-Disposition': f'attachment; filename="{os.path.basename(filepath)}"'}
     )
+
+
+@bp.route('/assemble', methods=['POST'])
+@login_required
+def archive_assemble():
+    """조각 조합 검증. 올바른 verification_code + classification → FLAG."""
+    verification_code = request.form.get('verification_code', '').strip()
+    classification = request.form.get('classification', '').strip()
+
+    if not verification_code or not classification:
+        return jsonify({'error': 'verification_code와 classification을 모두 입력하세요.'}), 400
+
+    # 검증: 조각 조합 결과 + 분류 코드
+    if verification_code == 'ARCHIVE:VERIFIED:GRANTED' and classification == 'IC-SEC-2026-A7B3':
+        flag = generate_flag('archive_smuggler', g.user['id'], current_app.config['SECRET_KEY'])
+        return jsonify({'success': True, 'flag': flag, 'message': '문서 검증 통과.'})
+
+    return jsonify({'success': False, 'message': '검증 코드 또는 분류 코드가 올바르지 않습니다.'}), 400
