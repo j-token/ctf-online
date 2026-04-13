@@ -3,8 +3,29 @@
 {% block page_title %}순위표{% endblock %}
 
 {% block content %}
+<!-- 현재 사용자 점수 요약 -->
+{% if current_user_score and current_user_score['total_score'] > 0 %}
+<div class="card" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.2);">내 점수</div>
+    <div style="padding: 20px; display: flex; justify-content: space-around; text-align: center;">
+        <div>
+            <div style="font-size: 2em; font-weight: bold;">{{ current_user_score['total_score'] }}</div>
+            <div style="opacity: 0.9;">총점</div>
+        </div>
+        <div>
+            <div style="font-size: 2em; font-weight: bold;">{{ current_user_score['solve_count'] }}</div>
+            <div style="opacity: 0.9;">풀이 수</div>
+        </div>
+        <div>
+            <div style="font-size: 2em; font-weight: bold;">{{ current_user_score['first_solve'][:10] if current_user_score['first_solve'] else '-' }}</div>
+            <div style="opacity: 0.9;">첫 풀이</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <div class="card">
-    <div class="card-header">전체 순위</div>
+    <div class="card-header">전체 순위 ({% if rankings %}{{ rankings|length }}{% else %}0{% endif %}명)</div>
     <div class="table-wrapper">
         <table>
             <thead>
