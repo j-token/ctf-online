@@ -13,6 +13,10 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get("SECRET_KEY", "intracore-ctf-secret-key-2026"),
         DATABASE=os.path.join(app.instance_path, "portal.sqlite3"),
         STORAGE_PATH=os.path.join(os.path.dirname(app.root_path), "seed_storage"),
+        # Railway 환경에서 세션 쿠키 설정
+        SESSION_COOKIE_HTTPONLY=True,
+        SESSION_COOKIE_SAMESITE="Lax",
+        PERMANENT_SESSION_LIFETIME=3600,  # 1시간
     )
 
     if test_config:
