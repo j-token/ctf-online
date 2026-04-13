@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}문서 보관소 - IntraCore{% endblock %}
+{% block page_title %}문서 보관소{% endblock %}
+
+{% block content %}
+<p class="section-desc">사내 공유 문서입니다. 파일명을 클릭하면 다운로드됩니다.</p>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>문서명</th>
+                    <th>분류</th>
+                    <th>등록일</th>
+                    <th>다운로드</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documents %}
+                <tr>
+                    <td>{{ doc['display_name'] }}</td>
+                    <td>{{ doc['category'] }}</td>
+                    <td class="text-muted">{{ doc['uploaded_at'] }}</td>
+                    <td>
+                        <a href="{{ url_for('archive.archive_download', name=doc['filename']) }}" class="btn btn-sm btn-primary">다운로드</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IntraCore Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/intracore.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-icon">&#9670;</span>
+                <span class="logo-text">IntraCore</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('dashboard.dashboard') }}" class="{% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">대시보드</a></li>
+                <li><a href="{{ url_for('leaderboard.leaderboard') }}" class="{% if request.endpoint == 'leaderboard.leaderboard' %}active{% endif %}">순위표</a></li>
+                <li class="nav-section">업무 시스템</li>
+                <li><a href="{{ url_for('directory.directory_list') }}" class="{% if request.endpoint and request.endpoint.startswith('directory.') %}active{% endif %}">직원 디렉토리</a></li>
+                <li><a href="{{ url_for('tickets.ticket_list') }}" class="{% if request.endpoint and request.endpoint.startswith('tickets.') %}active{% endif %}">헬프데스크</a></li>
+                <li><a href="{{ url_for('archive.archive_list') }}" class="{% if request.endpoint and request.endpoint.startswith('archive.') %}active{% endif %}">문서 보관소</a></li>
+                <li><a href="{{ url_for('finance.finance_index') }}" class="{% if request.endpoint and request.endpoint.startswith('finance.') %}active{% endif %}">급여 정산</a></li>
+                <li><a href="{{ url_for('reports.report_list') }}" class="{% if request.endpoint and request.endpoint.startswith('reports.') %}active{% endif %}">신고 시스템</a></li>
+                <li><a href="{{ url_for('verify.verify_index') }}" class="{% if request.endpoint and request.endpoint.startswith('verify.') %}active{% endif %}">레거시 검증기</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+                <div class="user-info">
+                    <span class="user-badge">{{ g.user['nickname'] }} ({{ g.user['role'] }})</span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-secondary">로그아웃</a>
+                </div>
+            </header>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div class="content-area">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <div id="flag-modal" class="modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>플래그 제출</h3>
+                <button class="modal-close" id="flag-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="flag-challenge">문제 선택</label>
+                    <select id="flag-challenge" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="flag-input">플래그</label>
+                    <input type="text" id="flag-input" class="form-control" placeholder="FLAG{...}">
+                </div>
+                <button id="flag-submit" class="btn btn-primary btn-full">제출</button>
+                <div id="flag-result" class="flag-result"></div>
+            </div>
+        </div>
+    </div>
+    <button id="flag-toggle" class="fab" title="플래그 제출">FLAG</button>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

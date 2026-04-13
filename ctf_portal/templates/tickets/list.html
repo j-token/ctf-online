@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}헬프데스크 - IntraCore{% endblock %}
+{% block page_title %}헬프데스크{% endblock %}
+
+{% block content %}
+<p class="section-desc">IT 지원 티켓 목록입니다. 제목을 클릭하면 상세 내용을 확인할 수 있습니다.</p>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>상태</th>
+                    <th>갱신일</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tickets %}
+                <tr>
+                    <td>#{{ t['id'] }}</td>
+                    <td><a href="{{ url_for('tickets.ticket_detail', ticket_id=t['id']) }}">{{ t['title'] }}</a></td>
+                    <td>{{ t['creator_name'] }}</td>
+                    <td>
+                        <span class="badge badge-{{ t['status'] }}">{{ t['status'] }}</span>
+                    </td>
+                    <td class="text-muted">{{ t['updated_at'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

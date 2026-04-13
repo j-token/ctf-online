@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}순위표 - IntraCore{% endblock %}
+{% block page_title %}순위표{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">전체 순위</div>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>닉네임</th>
+                    <th>역할</th>
+                    <th>풀이 수</th>
+                    <th>총점</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rankings %}
+                <tr class="{% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% endif %} {% if r['id'] == current_user_id %}rank-me{% endif %}">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ r['nickname'] }}</td>
+                    <td>{{ r['role'] }}</td>
+                    <td>{{ r['solve_count'] }}</td>
+                    <td>{{ r['total_score'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

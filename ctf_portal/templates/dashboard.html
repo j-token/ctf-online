@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}대시보드 - IntraCore{% endblock %}
+{% block page_title %}대시보드{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ g.user['nickname'] }}</div>
+        <div class="stat-label">{{ g.user['role'] }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_score }}</div>
+        <div class="stat-label">총점</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">#{{ rank }}</div>
+        <div class="stat-label">현재 순위 / {{ total_users }}명</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ solved_count }} / {{ total_challenges }}</div>
+        <div class="stat-label">풀이 진행도</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">최근 풀이 내역</div>
+    {% if recent_solves %}
+    <table>
+        <thead>
+            <tr>
+                <th>문제</th>
+                <th>점수</th>
+                <th>풀이 시각</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for solve in recent_solves %}
+            <tr>
+                <td>{{ solve['title'] }}</td>
+                <td>+{{ solve['points'] }}</td>
+                <td class="text-muted">{{ solve['solved_at'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">아직 풀이한 문제가 없습니다. 업무 시스템을 탐색해 보세요.</div>
+    {% endif %}
+</div>
+{% endblock %}

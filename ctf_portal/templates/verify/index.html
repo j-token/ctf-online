@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}레거시 검증기 - IntraCore{% endblock %}
+{% block page_title %}레거시 검증기{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">Legacy Verification System v1.2</div>
+    <p class="section-desc">
+        XOR 기반 메시지 인증 시스템입니다.<br>
+        <code>approval:finance:admin</code> 메시지에 대한 유효한 서명을 제출하면 감사 검증을 통과합니다.
+    </p>
+    <p class="section-desc">
+        <strong>알고리즘:</strong> 각 바이트에 대해 <code>signature[i] = message[i] XOR nonce[i % nonce_len]</code>
+    </p>
+</div>
+
+<div class="card">
+    <div class="card-header">공개 검증 샘플</div>
+    {% if samples %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>레이블</th>
+                    <th>메시지</th>
+                    <th>Nonce (hex)</th>
+                    <th>서명 (hex)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in samples %}
+                <tr>
+                    <td>{{ s['label'] }}</td>
+                    <td class="mono">{{ s['message'] }}</td>
+                    <td class="mono" style="font-size:11px; word-break:break-all;">{{ s['nonce'] }}</td>
+                    <td class="mono" style="font-size:11px; word-break:break-all;">{{ s['signature'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">공개 샘플이 없습니다.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-header">서명 검증</div>
+    <form method="post">
+        <div class="form-group">
+            <label for="message">메시지</label>
+            <input type="text" id="message" name="message" value="approval:finance:admin" placeholder="검증할 메시지">
+        </div>
+        <div class="form-group">
+            <label for="signature">서명 (hex)</label>
+            <input type="text" id="signature" name="signature" placeholder="hex 인코딩된 서명">
+        </div>
+        <button type="submit" class="btn btn-primary">검증</button>
+    </form>
+</div>
+{% endblock %}

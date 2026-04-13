@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}티켓 #{{ ticket['id'] }} - IntraCore{% endblock %}
+{% block page_title %}티켓 상세{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header flex-between">
+        <span>{{ ticket['title'] }}</span>
+        <span class="badge badge-{{ ticket['status'] }}">{{ ticket['status'] }}</span>
+    </div>
+    <table>
+        <tr><th style="width:100px">ID</th><td>#{{ ticket['id'] }}</td></tr>
+        <tr><th>작성자</th><td>{{ ticket['creator_name'] }}</td></tr>
+        <tr><th>생성일</th><td>{{ ticket['created_at'] }}</td></tr>
+        <tr><th>갱신일</th><td>{{ ticket['updated_at'] }}</td></tr>
+    </table>
+    <div class="mt-16">
+        <strong>설명</strong>
+        <p style="white-space: pre-wrap; margin-top: 8px;">{{ ticket['description'] }}</p>
+    </div>
+</div>
+
+{% if internal_memo %}
+<div class="card">
+    <div class="card-header">내부 복구 메모</div>
+    <p style="white-space: pre-wrap;">{{ internal_memo }}</p>
+</div>
+{% endif %}
+
+<div class="action-group mt-16">
+    {% if ticket['status'] == 'closed' or ticket['status'] == 'open' %}
+    <form method="post" action="{{ url_for('tickets.ticket_reopen', ticket_id=ticket['id']) }}">
+        <button type="submit" class="btn btn-warning">재오픈</button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('tickets.ticket_list') }}" class="btn btn-secondary">목록으로</a>
+</div>
+{% endblock %}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <path d="M16 2L30 16L16 30L2 16Z" fill="#e67e22"/>
+  <path d="M16 6L26 16L16 26L6 16Z" fill="#1a3a5c"/>
+  <text x="16" y="20" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="Arial">IC</text>
+</svg>

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ profile['nickname'] }} 프로필 - IntraCore{% endblock %}
+{% block page_title %}직원 프로필{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">{{ profile['nickname'] }}</div>
+    <table>
+        <tr><th style="width:120px">부서</th><td>{{ profile['department'] }}</td></tr>
+        <tr><th>직책</th><td>{{ profile['position'] }}</td></tr>
+        <tr><th>이메일</th><td class="mono">{{ profile['email'] }}</td></tr>
+        {% if profile['phone'] %}
+        <tr><th>전화</th><td>{{ profile['phone'] }}</td></tr>
+        {% endif %}
+        {% if profile['bio'] %}
+        <tr><th>소개</th><td>{{ profile['bio'] }}</td></tr>
+        {% endif %}
+    </table>
+</div>
+
+<!-- 디버그: 프로필 로드 완료. 비공개 메모 필드 포함됨 -->
+{% if private_note %}
+<!-- internal_note: {{ private_note }} -->
+{% endif %}
+
+<a href="{{ url_for('directory.directory_list') }}" class="btn btn-secondary mt-16">목록으로</a>
+{% endblock %}

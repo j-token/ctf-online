@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}신고 시스템 - IntraCore{% endblock %}
+{% block page_title %}신고 시스템{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">새 신고 작성</div>
+    <form method="post" action="{{ url_for('reports.report_create') }}">
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" name="title" required placeholder="신고 제목">
+        </div>
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" name="content" required placeholder="신고 내용을 상세히 작성해 주세요."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">신고 접수</button>
+    </form>
+</div>
+
+<div class="card mt-24">
+    <div class="card-header">접수된 신고 내역</div>
+    {% if reports %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>상태</th>
+                    <th>접수일</th>
+                    <th>미리보기</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr>
+                    <td>#{{ r['id'] }}</td>
+                    <td>{{ r['title'] }}</td>
+                    <td>{{ r['submitter_name'] }}</td>
+                    <td><span class="badge badge-{{ r['status'] }}">{{ r['status'] }}</span></td>
+                    <td class="text-muted">{{ r['created_at'] }}</td>
+                    <td>
+                        <a href="{{ url_for('reports.report_preview', report_id=r['id']) }}" class="btn btn-sm btn-secondary">미리보기</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">접수된 신고가 없습니다.</div>
+    {% endif %}
+</div>
+{% endblock %}

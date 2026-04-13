@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}직원 디렉토리 - IntraCore{% endblock %}
+{% block page_title %}직원 디렉토리{% endblock %}
+
+{% block content %}
+<p class="section-desc">사내 직원 목록입니다. 이름을 클릭하면 상세 프로필을 확인할 수 있습니다.</p>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>부서</th>
+                    <th>직책</th>
+                    <th>이메일</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in profiles %}
+                <tr>
+                    <td><a href="{{ url_for('directory.directory_profile', user_id=p['user_id']) }}">{{ p['nickname'] }}</a></td>
+                    <td>{{ p['department'] }}</td>
+                    <td>{{ p['position'] }}</td>
+                    <td class="mono">{{ p['email'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

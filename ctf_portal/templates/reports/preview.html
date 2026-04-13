@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}신고 미리보기 - IntraCore{% endblock %}
+{% block page_title %}관리자 미리보기{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">{{ report['title'] }}</div>
+    <table>
+        <tr><th style="width:100px">ID</th><td>#{{ report['id'] }}</td></tr>
+        <tr><th>작성자</th><td>{{ report['submitter_name'] }}</td></tr>
+        <tr><th>상태</th><td><span class="badge badge-{{ report['status'] }}">{{ report['status'] }}</span></td></tr>
+        <tr><th>접수일</th><td>{{ report['created_at'] }}</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">렌더링된 내용 (Review Pipeline)</div>
+    <div style="white-space: pre-wrap; padding: 12px; background: #f8fafc; border-radius: 4px;">{{ rendered_content }}</div>
+</div>
+
+<a href="{{ url_for('reports.report_list') }}" class="btn btn-secondary mt-16">목록으로</a>
+{% endblock %}
